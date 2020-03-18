@@ -1,4 +1,4 @@
-empty-0.6.19b -- run applications under pseudo-terminal (PTY) sessions and
+empty-0.6.20b -- run applications under pseudo-terminal (PTY) sessions and
 replace TCL/Expect with a simple tool under your favorite shell (sh, bash,
 csh, tcsh, ksh, zsh, etc)
 
