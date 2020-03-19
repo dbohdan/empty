@@ -1,14 +1,14 @@
 /* empty - run processes under pseudo-terminal sessions
- * 
+ *
  * Copyright (C) 2005-2012 Mikhail E. Zakharov
- * empty was written by Mikhail E. Zakharov. This software was based on the 
+ * empty was written by Mikhail E. Zakharov. This software was based on the
  * basic idea of pty version 4.0 Copyright (c) 1992, Daniel J. Bernstein, but
  * no code was ported from pty4.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions 
+ *  modification, are permitted provided that the following conditions
  *  are met:
- *  
+ *
  *  1. Redistributions of source code must retain the above copyright
  *     notice immediately at the beginning of the file, without modification,
  *     this list of conditions, and the following disclaimer.
@@ -20,14 +20,14 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
 
@@ -53,22 +53,20 @@
 	#include <libutil.h>
 #endif
 
-#ifdef __OpenBSD__
+#if defined(_OpenBSD__) || defined(__APPLE__)
 	#include <util.h>
 	#define EIDRM EINVAL		/* Thanks "Elisender" <allex_9@ngs.ru> */
 #endif
 
 #if defined (__linux__) || defined (__CYGWIN__)
-	#include <pty.h> 
+	#include <pty.h>
 	#include <utmp.h>
-	#include <time.h>
-	#include <sys/time.h>      
+	#include <sys/time.h>
 #endif
 
 #ifdef __AIX
-	#include <time.h>
 	#include <sys/stropts.h>
-	#include <sys/pty.h> 
+	#include <sys/pty.h>
 	#include <utmp.h>
 #endif
 
@@ -100,12 +98,13 @@
 #include <sys/param.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <time.h>
 
 #include <regex.h>
 
 #define tmpdir "/tmp"
 #define program "empty"
-#define version "0.6.20b" 
+#define version "0.6.21b"
 
 /* -------------------------------------------------------------------------- */
 static void usage(void);
@@ -117,7 +116,7 @@ void perrxslog(int ex_code, const char *err_text, ...);
 long pidbyppid(pid_t ppid, int lflg);
 void clean(void);
 void fsignal(int sig);
-int longargv(int argc, char *argv[]); 
+int longargv(int argc, char *argv[]);
 int checkgr(int argc, char *argv[], char *buf, int chkonly);
 int regmatch(const char *string, char *pattern, regex_t *re);
 int watch4str(int ifd, int ofd, int argc, char *argv[],
@@ -160,9 +159,9 @@ int main (int argc, char *argv[]) {
 	int	tflg = 0;		/* Timeout flag for -b (timeout?) */
 	int	pflg = 0;		/* Shall we save PID to a file? */
 	long	bs = 1;
-	
+
 	int	ksig = SIGTERM;
-	
+
 	pid_t	ppid;			/* Shell's PID */
 	char	infifo[MAXPATHLEN];
 	char	outfifo[MAXPATHLEN];
@@ -177,7 +176,7 @@ int main (int argc, char *argv[]) {
 	int	fl_state = 2;		/* 0 - in	>>>
 					   1 - out	<<<
 					   2 - unknown */
-	
+
 /* semaphores */
 /* Thanks to Waldemar Brodkorb <wbx@openadk.org> for the fix of semaphores nature */
 #if defined(__linux__) && defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)
@@ -199,7 +198,7 @@ int main (int argc, char *argv[]) {
 	};
 #endif
 	union semun semu;
-	
+
 #if defined(__SVR4) || defined(__hpux__) || defined(__AIX)
 	char	*slave_name;
 	int	pgrp;
@@ -227,11 +226,11 @@ int main (int argc, char *argv[]) {
 			case 'l':
 				lflg = 1;
 				break;
-			case 'i': 
+			case 'i':
 				in = optarg;
 				iflg = 1;
 				break;
-			case 'o': 
+			case 'o':
 				out = optarg;
 				oflg = 1;
 				break;
@@ -269,7 +268,7 @@ int main (int argc, char *argv[]) {
 				/* use stdin instead of FIFO */
 				cflg = 1;
 				break;
-		
+
 			case 'S':
 				/* Strip last character from input */
 				Sflg = 1;
@@ -284,12 +283,12 @@ int main (int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	
+
 	if ((fflg + kflg + wflg + sflg + lflg + rflg) != 1)
 		(void)usage();
 
 	ppid = getppid();
-	
+
 	if (kflg) {	/* kill PID with the SIGNAL */
 
 		if (argv[0]) {
@@ -297,9 +296,9 @@ int main (int argc, char *argv[]) {
 				fprintf(stderr, "Fatal: wrong PID value\n");
 				(void)usage();
 			}
-	
-			/* Signal */	
-			if (argv[1]) 
+
+			/* Signal */
+			if (argv[1])
 				ksig = (int)toint(argv[1]);
 		} else
 			if ((pid = pidbyppid(ppid, lflg)) < 1)
@@ -307,12 +306,12 @@ int main (int argc, char *argv[]) {
 
 		if (pid > 0 && (kill(pid, ksig) == -1))
 			(void)perrx(255, "Can't kill PID: %d", pid);
-	
+
 		(void)exit(0);
 	}
 
 	if (lflg) {
-		pidbyppid(ppid, lflg); 
+		pidbyppid(ppid, lflg);
 		(void)exit(0);
 	}
 
@@ -322,13 +321,13 @@ int main (int argc, char *argv[]) {
 				snprintf(outfifo, sizeof(outfifo), "%s/%s.%ld.%ld.in",
 					tmpdir, program, (long)ppid, (long)pid);
 				out = (char *)outfifo;
-			} else 
+			} else
 				(void)perrx(255, "Fatal can't find IN FIFO file by PPID:PID pair");
 		}
 
 		if ((ofd = open(out, O_WRONLY)) == -1)
 			(void)perrx(255, "Fatal open FIFO for writing: %s", out);
-		
+
 		if (!cflg && argv[0] != NULL) {
 			bl = parsestr(buf, argv[0], strlen(argv[0]), Sflg);
 			if (write(ofd, buf, bl) == -1)
@@ -351,7 +350,7 @@ int main (int argc, char *argv[]) {
 				snprintf(infifo, sizeof(infifo), "%s/%s.%ld.%ld.out",
 					tmpdir, program, (long)ppid, (long)pid);
 				in = (char *)infifo;
-			} else 
+			} else
 				(void)perrx(255, "Fatal can't find OUT FIFO file by PPID:PID pair");
 		}
 
@@ -364,14 +363,14 @@ int main (int argc, char *argv[]) {
 		stime = time(0);
         	tv.tv_sec = timeout;
 	        tv.tv_usec = 0;
-	
+
 		cc = -1; while (cc != 0) {
 			FD_SET(ifd, &rfd);
 			n = select(ifd + 1, &rfd, 0, 0, &tv);
 #ifdef __linux__
 			tv.tv_sec = timeout;	//fix because struct was set to 0; thanks "David Hofstee" <davidh@blinker.nl>
 #endif
-			if (n < 0 && errno != EINTR) 
+			if (n < 0 && errno != EINTR)
 				perrx(255, "Fatal select()");
 
 			if (n > 0 && FD_ISSET(ifd, &rfd)) {
@@ -381,20 +380,20 @@ int main (int argc, char *argv[]) {
 					(void)perrx(255, "Fatal write to STDOUT");
 				if ((!bflg && buf[0] == '\n') || bflg)
 					break;
-			} else 
+			} else
 				if (tflg) {
 					ntime = time(0);
 					if ((ntime - stime) >= timeout) {
 						(void)fprintf(stderr,
 							"%s: Buffer is empty. Exit on timeout\n",
 							program);
- 
+
 						(void)close(ifd);
 						(void)exit(255);
 				}
 			}
 		}
-		
+
 		(void)close(ifd);
 		(void)exit(0);
 	}
@@ -431,18 +430,18 @@ int main (int argc, char *argv[]) {
 	(void)openlog(program, 0, 0);
 	(void)syslog(LOG_NOTICE, "version %s started", version);
 	argv0 = argv[0];
-	
+
 	(void)tcgetattr(STDIN_FILENO, &tt);
         (void)ioctl(STDIN_FILENO, TIOCGWINSZ, &win);
 
 	if ((sem_key = ftok(sem_file, getpid())) == -1)
 		(void)perrxslog(255, "Can't generate semaphore key from file %s %m", sem_file);
-	
+
 	if ((sem = semget(sem_key, 1, 0600 | IPC_CREAT)) == -1)
 		(void)perrxslog(255, "Can't get semaphore %m");
 
 	semu.val = 0;
-	if (semctl(sem, 0, SETVAL, semu) == -1) 
+	if (semctl(sem, 0, SETVAL, semu) == -1)
 		(void)perrxslog(255, "Can't set semaphore %d to lock: %m", sem);
 
 	if ((pid = fork()) == -1)
@@ -454,27 +453,27 @@ int main (int argc, char *argv[]) {
 
 		(void)exit(0);
 	}
-	
+
 	if (setsid() < 0)
 		(void)perrxslog(255, "Daemonizing failed. Fatal setsid");
-	
+
 	if ((pid = fork()) == -1)
 		(void)perrxslog(255, "Daemonizing failed. Fatal second fork");
         /* Fork does not work properly */
-	if (pid > 0) 
+	if (pid > 0)
 		(void)exit(0);
 	pid = getpid();				/* MY PID */
-	
+
 	if (pflg) {
 		if ((pfd = open(pfile, O_CREAT|O_WRONLY, S_IRWXU)) == -1)
 			(void)syslog(LOG_NOTICE,
 				     "Warning: Can't write pid-file %s %m", pfile);
-		
+
 		pf = fdopen(pfd, "w");
 		fprintf(pf, "%ld\n", (long)pid);
 		fclose(pf);
 	}
-	
+
 	if (!(iflg && oflg)) {
 		sprintf(infifo, "%s/%s.%ld.%ld.in", tmpdir, program, (long)ppid, (long)pid);
 		sprintf(outfifo, "%s/%s.%ld.%ld.out", tmpdir, program, (long)ppid, (long)pid);
@@ -491,7 +490,7 @@ int main (int argc, char *argv[]) {
 		(void)perrxslog(255, "Fatal creating FIFO: %s", in);
 	if ((ofd = mfifo(out, O_RDWR)) == -1 && errno != ENXIO)
 		(void)perrxslog(255, "Fatal creating FIFO: %s", out);
-	
+
 	if (semop(sem, &free_sem, 1) == -1)
 		(void)perrxslog(255, "Can't release semaphore: %d from lock %m", sem);
 	if (semctl(sem, 0, IPC_RMID) == -1)
@@ -509,12 +508,12 @@ int main (int argc, char *argv[]) {
 			(void)perrxslog(255, "PTY routine failed. Fatal open(\"/dev/ptmx\"), ...");
 	#endif
 
-	#ifdef __hpux__  
+	#ifdef __hpux__
 		/* See the same definition for Solaris & UW several lines below */
 		if (grantpt(master) == -1)
 			(void)perrxslog(255, "Can't grant access to slave part of PTY: %m");
 	#endif
-	
+
 	if (unlockpt(master) == -1)
 		(void)perrxslog(255, "PTY routine failed. Fatal unlockpt()");
 
@@ -539,7 +538,7 @@ int main (int argc, char *argv[]) {
 	if (child == 0) {
 		(void)close(master);
 
-#if !defined(__SVR4) && !defined(__hpux__) && !defined(__AIX) 
+#if !defined(__SVR4) && !defined(__hpux__) && !defined(__AIX)
 		login_tty(slave);
 	#ifndef __CYGWIN__
 		cfmakeraw(&tt);
@@ -551,18 +550,18 @@ int main (int argc, char *argv[]) {
 		if ((slave = open(slave_name, O_RDWR)) == -1)
 			(void)perrxslog(255, "Fatal open slave part of PTY %s", slave_name);
 
-	#ifndef __AIX	
+	#ifndef __AIX
 		ioctl(slave, I_PUSH, "ptem");
 		ioctl(slave, I_PUSH, "ldterm");
 		ioctl(slave, I_PUSH, "ttcompat");
-	#endif	
+	#endif
 		/* Duplicate open file descriptor */
 		dup2(slave, 0);
 	       	dup2(slave, 1);
 	       	dup2(slave, 2);
 
-		/* Set foreground the main process */	 
-		if (tcsetpgrp(0, pgrp) == -1) 
+		/* Set foreground the main process */
+		if (tcsetpgrp(0, pgrp) == -1)
 	  	  (void)perrxslog(255, "Fatal tcsetpgrp()");
 
 #endif
@@ -571,12 +570,12 @@ int main (int argc, char *argv[]) {
 		/* Setup terminal parameters for Solaris to work under cron or java.
 		Thanks to "lang qiu" <qiulang@gmail.com> for the initial line of parameters.
 	       	and the same for AIX 5.3 by Ralf Winkel */
-		tt.c_lflag = ISIG | ICANON | ECHOE | ECHOK | ECHOCTL | ECHOKE | IEXTEN; 
+		tt.c_lflag = ISIG | ICANON | ECHOE | ECHOK | ECHOCTL | ECHOKE | IEXTEN;
 		tt.c_oflag = TABDLY | OPOST;
 		tt.c_iflag = BRKINT | IGNPAR | ISTRIP | ICRNL | IXON | IMAXBEL;
-		tt.c_cflag = CBAUD | CS8 | CREAD; 
+		tt.c_cflag = CBAUD | CS8 | CREAD;
 #endif
-		tt.c_lflag &= ~ECHO; 
+		tt.c_lflag &= ~ECHO;
 		(void)tcsetattr(STDIN_FILENO, TCSAFLUSH, &tt);
 
 		strncpy(buf, argv[0], sizeof(buf) - 1);
@@ -600,14 +599,14 @@ int main (int argc, char *argv[]) {
 	}
 
 	/* If this is the forked process */
-	FD_ZERO(&rfd);	
+	FD_ZERO(&rfd);
 	for (;;) {
 		FD_SET(master, &rfd);
 		FD_SET(ifd, &rfd);
-	
+
 		n = select(master + 1, &rfd, 0, 0, NULL);
 		if (n > 0 || errno == EINTR) {
-			if (FD_ISSET(ifd, &rfd)) 
+			if (FD_ISSET(ifd, &rfd))
 				if ((cc = read(ifd, buf, sizeof(buf))) > 0) {
 					/* our input */
 					(void)write(master, buf, cc);
@@ -703,7 +702,7 @@ long pidbyppid(pid_t ppid, int lflg) {
 					printf("PPID\tPID\tTYPE\tFILENAME\n");
 					header --;
 				}
-					
+
 				printf("%ld\t%ld\t%s\t%s/%s\n",
 					(long)ppid, (long)pid, tail, tmpdir, dent->d_name);
 			}
@@ -714,7 +713,7 @@ long pidbyppid(pid_t ppid, int lflg) {
 	if (closedir(dir) == -1)
 		(void)perror("Warning closing directory");
 
-	
+
 	if (lflg && pid > 0)
 		printf("\n%ld\t%ld\tcurrent\n", (long)ppid, (long)maxpid);
 
@@ -724,13 +723,13 @@ long pidbyppid(pid_t ppid, int lflg) {
 /* -------------------------------------------------------------------------- */
 void wait4child(int child, char *argv0) {
 	while ((pid = wait3(&status, WNOHANG, 0)) > 0)
-		if (pid == child)  
+		if (pid == child)
 			(void)syslog(LOG_NOTICE, "%s exited", argv0);
-}	
+}
 
 /* -------------------------------------------------------------------------- */
 int mfifo(char *fname, int mode) {
-   
+
    if (mkfifo(fname, S_IFIFO|S_IRWXU) == -1)
           return -1;
 
@@ -747,7 +746,7 @@ void clean(void) {
 	(void)unlink(in);
 	(void)unlink(out);
 	(void)unlink(pfile);
-}		
+}
 
 /* -------------------------------------------------------------------------- */
 void perrx(int ex_code, const char *err_text, ...) {
@@ -757,7 +756,7 @@ void perrx(int ex_code, const char *err_text, ...) {
 	va_start(va, err_text);
 	vsnprintf(err_buf, sizeof(err_buf), err_text, va);
 	va_end(va);
-	 
+
 	(void)perror(err_buf);
 	(void)exit(ex_code);
 }
@@ -765,7 +764,7 @@ void perrx(int ex_code, const char *err_text, ...) {
 /* -------------------------------------------------------------------------- */
 void perrxslog(int ex_code, const char *err_text, ...) {
 	va_list va;
-	
+
 	va_start(va, err_text);
 #if !defined(__hpux__) && !defined(__AIX) && !defined(__OSF1)
 	(void)vsyslog(LOG_NOTICE, err_text, va);
@@ -775,9 +774,9 @@ void perrxslog(int ex_code, const char *err_text, ...) {
 	vsprintf(err_buf, err_text, va);
 	(void)syslog(LOG_NOTICE, err_buf, "");
 #endif
-	
+
 	va_end(va);
-	
+
 	if (sem != -1)
 		semctl(sem, 0, IPC_RMID);
 
@@ -816,7 +815,7 @@ int longargv(int argc, char *argv[]) {
 			maxlen = len;
 		i++;
 	}
-	
+
 	return maxlen;
 }
 
@@ -828,8 +827,8 @@ int checkgr(int argc, char *argv[], char *buf, int chkonly) {
 	for (i = 1; i <= argc; i++) {
 		if (regcomp(&re, argv[i - 1], REG_EXTENDED | REG_NOSUB) != 0)
 			(void)perrx(255, "Regex compilation failed");
-	
-		if (chkonly != 1)	
+
+		if (chkonly != 1)
 			switch (regmatch(buf, argv[i - 1], &re)) {
 				case 1:	/* match */
 					return i;
@@ -859,14 +858,14 @@ int regmatch(const char *string, char *pattern, regex_t *re) {
 			return(0);
 
 		default:
-			(void)perrx(255, "Regex execution failed");	
+			(void)perrx(255, "Regex execution failed");
 	}
 
  	return(255);	/* Not reached */
 }
 
 /* -------------------------------------------------------------------------- */
-int watch4str(int ifd, int ofd, int argc, char *argv[], 
+int watch4str(int ifd, int ofd, int argc, char *argv[],
 		int Sflg, int vflg, int cflg, int timeout) {
 
 	int	n, cc, bl;
@@ -874,7 +873,7 @@ int watch4str(int ifd, int ofd, int argc, char *argv[],
 	struct	timeval tv;
 
 	int	argt = 0;
-	int	largv = 0; 
+	int	largv = 0;
 	char	*resp = NULL;
 
 
@@ -889,14 +888,14 @@ int watch4str(int ifd, int ofd, int argc, char *argv[],
 #ifdef __linux__
 		tv.tv_sec = timeout; //fix because struct was set to 0; thanks David Hofstee" <davidh@blinker.nl>
 #endif
-		if (n < 0 && errno != EINTR) 
+		if (n < 0 && errno != EINTR)
 			perrx(255, "Fatal select()");
 
 		if (n > 0 && FD_ISSET(ifd, &rfd)) {
 			largv = 0;
 			if ((cc = read(ifd, buf + largv, sizeof(buf) - largv)) > 0) {
 				stime = time(0);
-				
+
 				buf[cc + largv] = '\0';
 
 				if (vflg)
@@ -907,7 +906,7 @@ int watch4str(int ifd, int ofd, int argc, char *argv[],
 						/* Nb chars for buf */
 						bl = parsestr(buf, resp, strlen(resp), Sflg);
 						/* write response to fifo */
-						if (write(ofd, buf, bl) == -1) 
+						if (write(ofd, buf, bl) == -1)
 						    (void)perrx(255, "Fatal write data to output");
 					}
 					/* exit program */
@@ -942,7 +941,7 @@ int watch4str(int ifd, int ofd, int argc, char *argv[],
 /* -------------------------------------------------------------------------- */
 int parsestr(char *dst, char *src, int len, int Sflg) {
 	int i, bi;
-	
+
 	/* Return numbers of chars for response */
 	Sflg == 1 ? len-- : len;
 	for (i = 0, bi = 0; i < len; i++, bi++) {
@@ -971,4 +970,3 @@ int parsestr(char *dst, char *src, int len, int Sflg) {
 }
 
 /* -------------------------------------------------------------------------- */
-

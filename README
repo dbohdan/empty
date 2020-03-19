@@ -1,5 +1,5 @@
-empty-0.6.20b -- run applications under pseudo-terminal (PTY) sessions and
-replace TCL/Expect with a simple tool under your favorite shell (sh, bash,
+empty-0.6.21b -- run applications under pseudo-terminal (PTY) sessions and
+replace TCL/Expect with a simple tool under your favourite shell (sh, bash,
 csh, tcsh, ksh, zsh, etc)
 
 WARNING!
@@ -17,28 +17,25 @@ INSTALLATION
 		or
 		    make `uname -s`-gcc install clean
 
-	This will compile and place empty with its manual page under 
+	This will compile and place empty with its manual page under
 	/usr/local tree.
 
-	Empty was succesfully compiled and tested on:
-		FreeBSD 5.x - 10.x
-		NetBSD 1.x - 6.x
-		OpenBSD 3.x - 5.x 
-		Linux 2.4.x, 2.6.x, 3.x kernels 
-		SCO UnixWare 7.1.1, OpenUnix 8.0.0
-		SUN Solaris 6-10 (Sparc: cc, gcc), 8 (i386: gcc)
-		HP-UX 11.00, 11.11, 11.23 (pa-risc, itanium)
-		Cygwin DLL-1.5.19-4 (Experimental)
-		OSF1 4.0, 5.1
-		AIX 4.3, 5.1, 5.2, 5.3
-		
+	Empty was successfully compiled and tested on:
+		* FreeBSD, NetBSD, OpenBSD, macOS
+		* Linux kernels (32 and 64bits)
+		* SCO UnixWare 7.1.1, OpenUnix 8.0.0
+		* Oracle/SUN Solaris
+		* IBM AIX
+		* HP-UX 11.00, 11.11, 11.23 (pa-risc, itanium)
+		* Cygwin DLL-1.5.19-4 (Experimental, see README.CYGWIN)
+		* OSF1 4.0, 5.1
 
 USAGE
 	See empty(1) manual and samples under examples/ directory.
 
 
 BUGS
-	Please, send all your reports, patches and suggestions to 
+	Please, send all your reports, patches and suggestions to
 	zmey20000@yahoo.com. Developers are welcome.
 
 THANKS TO
@@ -61,10 +58,8 @@ THANKS TO
 	Vincenzo Maggio <vince.maggio@gmail.com>
 	Waldemar Brodkorb <wbx@openadk.org>
 
-	I express deep gratitude to Hewlett Packard AO Russia and personnaly to
+	I express deep gratitude to Hewlett Packard AO Russia and personally to
 	Denis Karzhavin and Andrew Kuchinsky for C110 (9000/777) workstation
 
-August 10, 2015
-Mikhail Zakharov
-zmey20000@yahoo.com
-
+March, 19, 2020
+Mikhail Zakharov <zmey20000@yahoo.com>

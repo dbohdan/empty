@@ -1,3 +1,8 @@
+19.03.2020 0.6.21b
+--------------------------------------------------------------------------------
+* macOS port
+* Decoration and syntax fixes
+
 10.08.2015 0.6.20b
 --------------------------------------------------------------------------------
 * Thanks to Waldemar Brodkorb <wbx@openadk.org> for the fix of semaphores nature
@@ -44,7 +49,7 @@
 --------------------------------------------------------------------------------
 * mfifo() bug under OpenBSD fixed
 * Empty is now fully functional under OpenBSD
-	Great thanks to Vincenzo Maggio (vince.maggio@gmail.com) for deep 
+	Great thanks to Vincenzo Maggio (vince.maggio@gmail.com) for deep
 		debugging under OpenBSD
 	Thanks to Aleksey Kozlov (avtolik@newmail.ru) for testing under OpenBSD
 	Thanks to Roman Gorohov (idle@idle.org.ru) for the free account at
@@ -69,7 +74,7 @@ Empty is fully operational on:
 	Linux RedHat and Suse (32 and 64bits)
 	OSF1: 4.0, 5.1
 	Solaris: 6,8,10 (sparc,x86)
-				
+
 15.04.2006 0.6.10a
 --------------------------------------------------------------------------------
 * succesfully tested on HP-UX 11.11 PA-RISC1.1 (9000/777)
@@ -106,13 +111,13 @@ Empty is fully operational on:
 
 23.12.2005 0.6.6b
 --------------------------------------------------------------------------------
-* Bug in IPCS on removing semaphores for the dead sessions (fixed). 
+* Bug in IPCS on removing semaphores for the dead sessions (fixed).
 Thanks to "Dmitry S. Vlasov" (vlasov@quantum.ru) for discovering it.
 
 16.12.2005 0.6.5b
 --------------------------------------------------------------------------------
 * Option -L enables logging all input and output to the file
-* Bug with getopt() under Linux which was discovered 
+* Bug with getopt() under Linux which was discovered
 	by "Alex Slyotov" <aslyotov@gmail.com>. Fixed
 * Option -r allows to read a line or a block (if -b size is specified) of data
 	from input FIFO. Thanks to "Alex Slyotov" (aslyotov@gmail.com) for the
@@ -121,12 +126,12 @@ Thanks to "Dmitry S. Vlasov" (vlasov@quantum.ru) for discovering it.
 
 12.11.2005 0.6.4b
 --------------------------------------------------------------------------------
-* Empty fails (now fixed) to remove semaphores on  kill-signals. The bug was 
+* Empty fails (now fixed) to remove semaphores on  kill-signals. The bug was
 discovered by Dmitry S. Vlasov vlasov@quantum.ru. Thanks!
 
 06.11.2005 0.6.3b
 --------------------------------------------------------------------------------
-* Empty failed to compile under Solaris-8 with gcc. 
+* Empty failed to compile under Solaris-8 with gcc.
 	Thanks  to sdio (sdio4lor@gmail.com). Fixed.
 * Additional, lots of IPC bugs were discovered under SVR4 branch, all of them
 	are fixed, I hope.
@@ -137,7 +142,7 @@ discovered by Dmitry S. Vlasov vlasov@quantum.ru. Thanks!
 * Option -w supports multiple pairs of "key-response"
 * Syntax getting harder to understand so I had removed STDIN support for -w key
 * Makefile reorganized: Solaris and UnixWare are moved to Makefile.SVR4
-* Semaphores implemented to replase -r key timeouts. Awfull -r key was removed 
+* Semaphores implemented to replase -r key timeouts. Awfull -r key was removed
 	once and I hope forever!
 * Several bugs fixed
 * Documentation updated
@@ -173,4 +178,3 @@ discovered by Dmitry S. Vlasov vlasov@quantum.ru. Thanks!
 17.04.2005 0.5.5b
 --------------------------------------------------------------------------------
 * Software published
-
