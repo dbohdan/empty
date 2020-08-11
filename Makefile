@@ -14,6 +14,8 @@ CC =	cc
 LIBS =	-lutil
 
 PREFIX = /usr/local
+BINDIR = $(PREFIX)/bin
+MANDIR = $(PREFIX)/man/man1
 
 all:
 	${CC} ${CFLAGS} -Wall ${LIBS} -o empty empty.c
@@ -41,11 +43,11 @@ SunOS-gcc:
 
 install:
 	[ -f `which strip` ] && strip empty
-	[ -d ${PREFIX}/bin ] && cp empty ${PREFIX}/bin || mkdir -p ${PREFIX}/bin && cp empty ${PREFIX}/bin
-	[ -d ${PREFIX}/man/man1 ] && cp empty.1 ${PREFIX}/man/man1 || mkdir -p ${PREFIX}/man/man1 && cp empty.1 ${PREFIX}/man/man1
+	[ -d ${BINDIR} ] && cp empty ${BINDIR} || mkdir -p ${BINDIR} && cp empty ${BINDIR}
+	[ -d ${MANDIR} ] && cp empty.1 ${MANDIR} || mkdir -p ${MANDIR} && cp empty.1 ${MANDIR}
 deinstall:
-	rm ${PREFIX}/bin/empty
-	rm ${PREFIX}/man/man1/empty.1
+	rm ${BINDIR}/empty
+	rm ${MANDIR}/empty.1
 uninstall:	deinstall
 
 clean:
